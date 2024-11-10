@@ -1,7 +1,10 @@
 // FILE: main.js
 
 import { createApp } from 'vue'
-import { Quasar } from 'quasar'
+import {
+    Quasar,
+    Notify
+} from 'quasar'
 import { createPinia } from 'pinia'
 import router from './router'
 // Import icon libraries
@@ -22,9 +25,10 @@ const pinia = createPinia()
 const app = createApp(App)
 app.use(Quasar, {
     plugins: {
-        Notify: {}
+        Notify
     }, // import Quasar plugins and add here
     config: {
+        notify: {},
         brand: {
             // ... or all other brand colors
         },

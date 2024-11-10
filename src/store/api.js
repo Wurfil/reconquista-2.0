@@ -18,14 +18,12 @@ export const uploadingNewDocument = async (files, name) => {
 
     formData.append('files', files);
 
-    // const { data } = await http.post(`/add_base/`, {
-    //     body: {
-    //         formData,
-    //         name
-    //     },
-    // });
-    setTimeout(() => {
-        return false
-    },5000)
+    const { data } = await http.post(`/add_base/`, {
+        body: {
+            formData,
+            name
+        },
+    });
+
     return data.value;
 }
