@@ -6,6 +6,7 @@ export const useChatStore = defineStore('chat', {
     state: () => ({
         currentChatHistory: [],
         loading: false,
+        openImage: ''
     }),
     actions: {
         async sendMessage(message) {
@@ -17,6 +18,7 @@ export const useChatStore = defineStore('chat', {
                 type: 'ai',
                 content: answer.data.answer,
                 pic: answer.data.context[0].base64,
+                context: answer.data.context,
                 date: new Date()
             }
             this.currentChatHistory.push(pettyAnswer)

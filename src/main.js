@@ -21,7 +21,9 @@ const pinia = createPinia()
 
 const app = createApp(App)
 app.use(Quasar, {
-    plugins: {}, // import Quasar plugins and add here
+    plugins: {
+        Notify: {}
+    }, // import Quasar plugins and add here
     config: {
         brand: {
             // ... or all other brand colors

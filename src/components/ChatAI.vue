@@ -6,14 +6,53 @@
     <q-spinner size="36" />
   </div>
   <div
+    v-if="!chatStore.currentChatHistory.length"
+    class="tw-flex tw-min-h-[80vh] tw-justify-center tw-items-center"
+  >
+    <q-card
+      flat
+      class="tw-bg-primary/25 tw-flex-col tw-w-[250px] tw-h-[250px] tw-flex tw-justify-center tw-items-center"
+    >
+      <div class="tw-text-lg tw-font-black tw-mb-2">
+        Пока еще нет сообщений
+      </div>
+      <div class="tw-text-base tw-w-[250px] tw-mb-5 text-center">
+        Введите сообщение вашему ассистенту, например
+      </div>
+      <div class="tw-flex tw-flex-col tw-justify-center tw-items-center tw-w-full">
+        <q-btn
+          no-caps
+          rounded
+          color="secondary"
+          flat
+
+          class="tw-mt-2"
+          @click="chatStore.sendMessage(transformSendedMessage('Какие прогнозы на 2025 год'))"
+        >
+          Какие прогнозы на 2025 год
+        </q-btn>
+        <q-btn
+          no-caps
+          rounded
+          color="secondary"
+          flat
+          class="tw-mt-2"
+          @click="chatStore.sendMessage(transformSendedMessage('Сколько просмотров в день у VK клипов?'))"
+        >
+          Сколько просмотров в день у VK клипов?
+        </q-btn>
+      </div>
+    </q-card>
+  </div>
+  <div
     v-for="chat in chatStore.currentChatHistory"
     :key="chat"
   >
     <q-chat-message
       v-if="chat.type === 'ai'"
       class="tw-text-base tw-pr-0 laptop:tw-pr-28 before:tw-content-none "
-      bg-color="white"
-      text-color="black"
+      bg-color="secondary"
+      text-color="white"
     >
       <template #name>
         <p class="tw-text-sm tw-opacity-50 tw-mb-2">
@@ -29,37 +68,37 @@
           class="tw-p-1 tw-mb-2"
           v-html="chat.content.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')"
         />
+      </div>
+    </q-chat-message>
+    <q-chat-message
+      v-if="chat.type === 'ai'"
+      class="tw-text-base pic tw-pr-0 laptop:tw-pr-28 before:tw-content-none "
+      bg-color="white"
+      text-color="white"
+    >
+      <div class="tw-flex tw-flex-col">
         <q-img
           v-if="chat.pic"
           :src="`data:image/png;base64, ${chat.pic}`"
           alt="Base64 Image"
-          class="gallery-image tw-mb-2 cursor-pointer"
+          width="300px"
+          class="gallery-image tw-rounded-[14px] cursor-pointer"
           @click="openFullScreen(`data:image/png;base64, ${chat.pic}`)"
-        >
-          <q-btn
-            v-if="chat.fullAnswer !== 'Я не знаю.' && !!chat.fullAnswer"
-            dense
-            flat
-            color="primary"
-            no-caps
-            @click="openAdditional(chat)"
-          >
-            Подробнее
-          </q-btn>
-        </q-img>
-        <q-btn
-          no-caps
-          flat
-          color="primary"
-          @click="moreInfo()"
-        >
-          Подробнее
-        </q-btn>
+        />
       </div>
     </q-chat-message>
-
+    <q-btn
+      v-if="chat.pic && chat.type === 'ai'"
+      no-caps
+      flat
+      rounded
+      color="secondary"
+      @click="moreInfo(chat.context)"
+    >
+      Похожие презентации
+    </q-btn>
     <q-chat-message
-      v-else
+      v-if="chat.type === 'human'"
       class="tw-text-base tw-ml-16 tablet:tw-pl-40 before:tw-content-none"
       bg-color="primary"
       text-color="white"
@@ -103,36 +142,42 @@
   >
     <q-img
       id="fullScreenImage"
-      :src="openImage"
+      :src="chatStore.openImage"
       class="overlay-image cursor-pointer"
     />
   </div>
 </template>
 
 <script setup>
-import { format } from 'date-fns';
+import {format} from 'date-fns';
 import {ref, watch} from "vue";
 import {useChatStore} from "@/store/index.js";
+import {transformSendedMessage} from "@/helpers/index.js";
+
 const openImage = ref('')
 const openAdditionalModal = ref({
   fullAnswer: '',
   question: '',
 });
 const chatStore = useChatStore()
+const emits = defineEmits(['open-more-info'])
 
-function moreInfo() {
-
+function moreInfo(content) {
+  emits('open-more-info', content)
 }
+
 function openFullScreen(img) {
   const overlay = document.getElementById('overlay');
-  openImage.value = img; // Устанавливаем источник изображения
+  chatStore.openImage = img; // Устанавливаем источник изображения
   overlay.style.display = 'flex'; // Показываем оверлей
 }
 
 function closeFullScreen() {
   const overlay = document.getElementById('overlay');
+  chatStore.openImage = ''; // Устанавливаем источник изображения
   overlay.style.display = 'none'; // Скрываем оверлей
 }
+
 const question = ref('');
 const loadingChat = ref(false);
 
@@ -217,6 +262,14 @@ async function sendMessageDepr() {
 }
 </script>
 <style lang="scss">
+.pic {
+  .q-message-text {
+    padding: 0px 0px 8px 0px  !important;
+    border: 1px solid $primary;
+    box-sizing: border-box;
+  }
+}
+
 .image-gallery img {
   width: 200px; /* Размер миниатюр */
   cursor: pointer;
@@ -232,7 +285,7 @@ async function sendMessageDepr() {
   background-color: rgba(0, 0, 0, 0.8); /* Полупрозрачный черный фон */
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 20000;
 }
 
 .overlay-image {
@@ -243,13 +296,14 @@ async function sendMessageDepr() {
 .q-message-text:last-child:before {
   display: none;
 }
+
 .q-input {
   width: 100%;
   box-sizing: border-box;
 }
+
 .q-message-text--received {
   border-radius: 15px;
-  border: solid $primary 1px;
 }
 
 .q-message-text--sent {
