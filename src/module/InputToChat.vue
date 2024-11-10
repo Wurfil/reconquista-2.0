@@ -49,7 +49,7 @@ async function sendMessage(event) {
 
     await chat.sendMessage(transformSendedMessage(temp))
     window.scrollTo(0, document.body.scrollHeight);
-    
+
   }
 }
 </script>
