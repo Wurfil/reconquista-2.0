@@ -43,16 +43,13 @@ async function sendMessage(event) {
     event.preventDefault()
     event.target.blur()
 
-    await router.push('/chat')
-
     const temp = message.value
     message.value = ''
     window.scrollTo(0, document.body.scrollHeight);
 
     await chat.sendMessage(transformSendedMessage(temp))
-    if (document.body.scrollHeight > window.innerHeight) {
-      window.scrollTo(0, document.body.scrollHeight);
-    }
+    window.scrollTo(0, document.body.scrollHeight);
+    
   }
 }
 </script>
