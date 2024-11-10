@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  mz-frontend-new:
+    image: cr.yandex/crpj4fcsfs8pm44lbm0r/mz-frontend
+    ports:
+      - "3100:3100"
+    restart: always

@@ -1,0 +1,10 @@
+@font-face {
+    font-family: 'Yandex Sans Display';
+    src: url('@/assets/YandexSansDisplay-Regular.eot');
+    src: url('@/assets/YandexSansDisplay-Regular.woff');
+    font-weight: normal;
+    font-style: normal;
+}
+body{
+    font-family: 'Yandex Sans Display', system-ui, Avenir, Helvetica, Arial, sans-serif !important;
+}
